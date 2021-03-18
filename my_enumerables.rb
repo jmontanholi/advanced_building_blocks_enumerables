@@ -59,37 +59,6 @@ module Enumerable
   end
 
   def multiply_els
-    self.my_inject(1){ |prod, value| prod * value }
+    my_inject(1) { |prod, value| prod * value }
   end
 end
-
-
-
-puts
-puts '---CONTROL---'
-control = [1, 2, 8, 5, 5]
-puts "control array = #{control}"
-puts
-puts 'my_each:'
-control.my_each { |i| print "#{i} " }
-puts 'my_each:'
-control.my_each_with_index { |i, ind| print "#{ind}:#{i} " }
-puts 'my_select:'
-p control.my_select { |i| i < 3 }
-puts 'my_all?:'
-p control.my_all? { |i| i < 3 }
-puts 'my_any?:'
-p control.my_any? { |i| i < 3 }
-puts 'my_none?:'
-p control.my_none? { |i| i < 3 }
-puts 'my_count:'
-p control.my_count(&:even?)
-p control.my_count
-p control.my_count(5)
-puts 'my_map:'
-p control.my_map { |i| i * 2 }
-puts 'my_inject:'
-p control.my_inject(10) { |sum, value| sum + value}
-
-puts "multiply_els:"
-p control.multiply_els
