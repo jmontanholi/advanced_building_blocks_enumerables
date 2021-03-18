@@ -9,25 +9,25 @@ module Enumerable
 
   def my_select
     arr_new = []
-    length.times { |i| arr_new.push(self[i]) if yield(self[i]) }
+    self.my_each { |i| arr_new << i if yield(i) }
     arr_new
   end
 
   def my_all?
     next_value = 0
-    length.times { |i| next_value += 1 if yield(self[i]) }
+    self.my_each { |i| next_value += 1 if yield(i) }
     next_value == length
   end
 
   def my_any?
     next_value = 0
-    length.times { |i| next_value += 1 if yield(self[i]) }
+    self.my_each { |i| next_value += 1 if yield(i) }
     next_value.positive?
   end
 
   def my_none?
     next_value = 0
-    length.times { |i| next_value += 1 if yield(self[i]) }
+    self.my_each { |i| next_value += 1 if yield(i) }
     next_value.zero?
   end
 
@@ -35,13 +35,13 @@ module Enumerable
     count = 0
     if arg.nil?
       if block_given?
-        length.times { |i| count += 1 if yield(self[i]) }
+        self.my_each { |i| count += 1 if yield(i) }
         count
       else
         count = length
       end
     else
-      length.times { |i| count += 1 if self[i] == arg }
+      self.my_each { |i| count += 1 if i == arg }
       count
     end
     count
@@ -49,12 +49,12 @@ module Enumerable
 
   def my_map
     arr_new = []
-    length.times { |i| arr_new << yield(self[i]) }
+    self.my_each { |i| arr_new << yield(i) }
     arr_new
   end
 
   def my_inject(initial_value = 0)
-    length.times { |i| initial_value = yield(initial_value, self[i]) }
+    self.my_each { |i| initial_value = yield(initial_value, i) }
     initial_value
   end
 
