@@ -67,6 +67,7 @@ def multiply_els(arr)
 end
 
 # Testing
+=begin
 
 control = [10, 1, 2, 5, 7, 8, 9, 12, 13, 14, 15, 16, 17, 18, 19, 20, 1]
 
@@ -100,4 +101,5 @@ p control.my_inject(10) { |sum, i| sum + i }
 
 puts "multiply_els:"
 p multiply_els(control)
+=end
 
