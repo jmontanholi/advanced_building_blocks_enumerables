@@ -25,10 +25,26 @@ module Enumerable
     next_value.positive?
   end
 
-  def my_count(arg)
+  def my_none?
     next_value = 0
-    length.times { |i| next_value += 1 if self[i] == arg }
-    next_value
+    length.times { |i| next_value += 1 if yield(self[i]) }
+    next_value.zero?
+  end
+
+  def my_count(arg = nil)
+    count = 0
+    if arg.nil?
+      if block_given?
+        length.times { |i| count += 1 if yield(self[i]) }
+        count
+      else
+        count = length
+      end
+    else
+      length.times { |i| count += 1 if self[i] == arg }
+      count
+    end
+    count
   end
 end
 
@@ -43,10 +59,13 @@ puts 'my_each:'
 control.my_each_with_index { |i, ind| print "#{ind}:#{i} " }
 puts 'my_select:'
 p control.my_select { |i| i < 3 }
-puts "my_all?:"
+puts 'my_all?:'
 p control.my_all? { |i| i < 3 }
-puts "my_any?:"
+puts 'my_any?:'
 p control.my_any? { |i| i < 3 }
-
-puts "my_count:"
+puts 'my_none?:'
+p control.my_none? { |i| i < 3 }
+puts 'my_count:'
+p control.my_count(&:even?)
+p control.my_count
 p control.my_count(5)
