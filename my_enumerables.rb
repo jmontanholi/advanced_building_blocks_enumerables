@@ -12,6 +12,12 @@ module Enumerable
     length.times { |i| arr_new.push(self[i]) if yield(self[i]) }
     arr_new
   end
+
+  def my_all? 
+    next_value = 0
+    length.times { |i|  next_value+=1 if yield(self[i]) }
+    next_value == length
+  end
 end
 
 puts
@@ -25,3 +31,5 @@ puts 'my_each:'
 control.my_each_with_index { |i, ind| print "#{ind}:#{i} " }
 puts 'my_select:'
 p control.my_select { |i| i < 3 }
+puts "my_all?:"
+p control.my_all? { |i| i < 9 }
