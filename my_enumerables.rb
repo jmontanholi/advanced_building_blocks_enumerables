@@ -46,6 +46,12 @@ module Enumerable
     end
     count
   end
+
+  def my_map
+    arr_new = []
+    length.times { |i| arr_new << yield(self[i]) }
+    arr_new
+  end
 end
 
 puts
@@ -69,3 +75,6 @@ puts 'my_count:'
 p control.my_count(&:even?)
 p control.my_count
 p control.my_count(5)
+
+puts "my_map:"
+p control.my_map{ |i| i * 2 }
