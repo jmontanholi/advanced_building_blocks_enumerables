@@ -13,10 +13,16 @@ module Enumerable
     arr_new
   end
 
-  def my_all? 
+  def my_all?
     next_value = 0
-    length.times { |i|  next_value+=1 if yield(self[i]) }
+    length.times { |i| next_value += 1 if yield(self[i]) }
     next_value == length
+  end
+
+  def my_any?
+    next_value = 0
+    length.times { |i| next_value += 1 if yield(self[i]) }
+    next_value.positive?
   end
 end
 
@@ -32,4 +38,6 @@ control.my_each_with_index { |i, ind| print "#{ind}:#{i} " }
 puts 'my_select:'
 p control.my_select { |i| i < 3 }
 puts "my_all?:"
-p control.my_all? { |i| i < 9 }
+p control.my_all? { |i| i < 3 }
+puts "my_any?:"
+p control.my_any? { |i| i < 3 }
