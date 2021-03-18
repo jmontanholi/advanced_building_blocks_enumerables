@@ -52,6 +52,12 @@ module Enumerable
     length.times { |i| arr_new << yield(self[i]) }
     arr_new
   end
+
+  def my_inject(initial_value = 0)
+    sum = 0
+    length.times { |i| initial_value += yield(sum, self[i]) }
+    initial_value
+  end
 end
 
 puts
@@ -75,6 +81,7 @@ puts 'my_count:'
 p control.my_count(&:even?)
 p control.my_count
 p control.my_count(5)
-
-puts "my_map:"
-p control.my_map{ |i| i * 2 }
+puts 'my_map:'
+p control.my_map { |i| i * 2 }
+puts 'my_inject:'
+p control.my_inject(10) { |sum, i| sum + i }
