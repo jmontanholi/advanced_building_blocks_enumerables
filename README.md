@@ -2,7 +2,7 @@
 
 # Ruby Module - Microverse - Enumerables
 
-> description of project
+> In this project we re-created the Ruby enumerables from scratch.
 
 ## Built With
 
