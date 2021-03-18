@@ -24,6 +24,12 @@ module Enumerable
     length.times { |i| next_value += 1 if yield(self[i]) }
     next_value.positive?
   end
+
+  def my_count(arg)
+    next_value = 0
+    length.times { |i| next_value += 1 if self[i] == arg }
+    next_value
+  end
 end
 
 puts
@@ -41,3 +47,6 @@ puts "my_all?:"
 p control.my_all? { |i| i < 3 }
 puts "my_any?:"
 p control.my_any? { |i| i < 3 }
+
+puts "my_count:"
+p control.my_count(5)
