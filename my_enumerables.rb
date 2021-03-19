@@ -122,16 +122,18 @@ module Enumerable
 
   def my_map(proc = nil)
     arr_new = []
-    if block_given?
+    if proc != nil 
+      my_each { |i| arr_new << proc.call(i) }
+    elsif block_given?
       my_each { |i| arr_new << yield(i) }
     else
-      my_each { |i| arr_new << proc.call(i) }
+      return to_enum(:my_map)
     end
     arr_new
   end
 
-  def my_inject(initial_value = 0)
-    my_each { |i| initial_value = yield(initial_value, i) }
+  def my_inject(initial_value = nil)
+    my_each { |i| initial_value = yield(i, i) }
     initial_value
   end
 end
@@ -166,12 +168,16 @@ p control4.my_none?(Numeric)
 puts "my_count:"
 p control.my_count
 p control.my_count
-# my_proc = Proc.new { |i| i % 2 }
-# puts "my_map:"
-# p control.my_map(my_proc)
-# p control.my_map { |i| i * 2 }
-# p control.my_map { |i| i * 2 }.my_map(my_proc)
-# puts "my_inject:"
-# p control.my_inject(10) { |sum, i| sum + i }
+ my_proc = Proc.new { |i| i + 1 }
+ puts "my_map:"
+ p control.my_map(my_proc){ |i| i * 2 }
+ p (1..6).my_map { |i| i * 2 }
+ p control.my_map { |i| i * 2 }.my_map(my_proc)
+ p control.my_map 
+puts "my_inject:"
+
+
+
+p %w[cat sheep bear].my_inject {|memo, word| memo.length > word.length ? memo : word}
 # puts "multiply_els:"
 # p multiply_els(control)
