@@ -31,15 +31,21 @@ module Enumerable
     if block_given?
       my_each { |i| break all = false unless yield(i) }
     elsif !arg.nil?
-      if arg.instance_of?(Regexp)
-        my_each { |i| break all = false if i.to_s.match(arg).nil? }
-      elsif arg.is_a?(Class)
-        my_each { |i| break all = false unless i.is_a?(arg) }
-      else
-        my_each { |i| break all = false if i != arg }
-      end
+      all = self.getIntance(arg)
     else
       my_each { |i| break all = false if [false, nil].include?(i) }
+    end
+    all
+  end
+
+  private def getIntance(arg)
+    all = true
+    if arg.instance_of?(Regexp)
+      my_each { |i| break all = false if i.to_s.match(arg).nil? }
+    elsif arg.is_a?(Class)
+      my_each { |i| break all = false unless i.is_a?(arg) }
+    else
+      my_each { |i| break all = false if i != arg }
     end
     all
   end
@@ -150,7 +156,7 @@ control = [10, 1, 2, 5, 7, 8, 9, 12, 13, 14, 15, 16, 17, 18, 19, 20, 1 ]
  p control.my_select
  puts "my_all?:"
  p control2.my_all?(Numeric)
- p test.my_all?(String)
+ p test.my_all?(Numeric)
  p test.my_all?(/a/)
  puts "my_any?:"
  p control3.my_any?(/a/)
