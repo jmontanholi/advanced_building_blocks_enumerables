@@ -34,7 +34,7 @@ module Enumerable
     elsif !arg.nil?
       if arg.class == Regexp 
         control = 0
-        my_each { |i| control += 1 unless !!(i.match(arg) )}
+        my_each { |i| control += 1 unless !!(i.to_s.match(arg) )}
         control.zero?
       elsif arg.is_a? (Class)
         control = 0
@@ -52,14 +52,56 @@ module Enumerable
     end
   end
 
-  def my_any?
-    any = false
-    my_each { |i| break any = true if yield(i) }
-    any
+  def my_any?(arg=nil)
+    if block_given? 
+      all = true
+      my_each { |i| break all = false unless yield(i) }
+      all 
+    elsif !arg.nil?
+      if arg.class == Regexp 
+        control = 0
+        my_each { |i| control += 1 if !!(i.to_s.match(arg))}
+        control.positive?
+      elsif arg.is_a? (Class)
+        control = 0
+        my_each { |i| break control += 1 if (i.kind_of? (arg))}
+        control.positive?
+      else
+        control = 0
+        my_each { |i| control += 1 if i == arg }
+        control.positive?
+      end
+    else
+      control = 0
+      self.my_each{ |i| control += 1 if i == false || i == nil}
+      control.zero?
+    end
   end
 
-  def my_none?(&block)
-    !my_any?(&block)
+  def my_none?(arg = nil)
+    if block_given? 
+      control = 0
+      my_each { |i| control += 1 unless yield(i) }
+      control.zero? 
+    elsif !arg.nil?
+      if arg.class == Regexp 
+        control = 0
+        my_each { |i| control += 1 if !!(i.to_s.match(arg))}
+        control.zero?
+      elsif arg.is_a? (Class)
+        control = 0
+        my_each { |i| control += 1 if (i.kind_of? (arg))}
+        control.zero?
+      else
+        all = true
+        my_each { |i| break all = false if i != arg }
+        all 
+      end
+    else
+      control = 0
+      self.my_each{ |i| control += 1 if i != false || i != nil}
+      control.zero?
+    end
   end
 
   def my_count(arg = nil)
@@ -69,7 +111,7 @@ module Enumerable
         my_each { |i| count += 1 if yield(i) }
         count
       else
-        count = length
+        count = size
       end
     else
       my_each { |i| count += 1 if i == arg }
@@ -101,6 +143,8 @@ end
 # Testing
 control = [10, 1, 2, 5, 7, 8, 9, 12, 13, 14, 15, 16, 17, 18, 19, 20, 1 ]
 control2 = [10, 1, 2, 5, 7, 8, 9, 12, 13, 14, 15, 16, 17, 18, 19, 20, 1 ]
+control3 = [1, "_"]
+control4 = ["a", "b"]
 test = ["a", "ba"]
 puts "my_each:"
 p control.my_each { |value| value < 3 }
@@ -115,13 +159,13 @@ puts "my_all?:"
 p control2.my_all?(Numeric)
 p test.my_all?(String)
 p test.my_all?(/a/)
-# puts "my_any?:"
-# p control.my_any? { |i| i < 15 }
-# puts "my_none?:"
-# p control.my_none? { |i| i < 15 }
-# puts "my_count:"
-# p control.my_count(1)
-# p control.my_count
+puts "my_any?:"
+p control3.my_any?(/a/)
+puts "my_none?:"
+p control4.my_none?(Numeric)
+puts "my_count:"
+p control.my_count
+p control.my_count
 # my_proc = Proc.new { |i| i % 2 }
 # puts "my_map:"
 # p control.my_map(my_proc)
