@@ -1,16 +1,16 @@
 module Enumerable
-  def my_each
+  def my_each(&block)
     return to_enum(:my_each) unless block_given?
-    for i in self do
-      yield(i)
-    end
+
+    each(&block)
     self
   end
 
   def my_each_with_index
     return to_enum(:my_each_with_index) unless block_given?
+
     count = 0
-    for i in self do
+    each do |i|
       yield(i, count)
       count += 1
     end
@@ -26,82 +26,68 @@ module Enumerable
   end
 
   def my_all?(arg = nil)
-    return false if self.empty?
-    if block_given? 
-      all = true
+    return false if empty?
+
+    control = 0
+    all = true
+    if block_given?
       my_each { |i| break all = false unless yield(i) }
-      all 
+      all
     elsif !arg.nil?
-      if arg.class == Regexp 
-        control = 0
-        my_each { |i| control += 1 unless !!(i.to_s.match(arg) )}
-        control.zero?
-      elsif arg.is_a? (Class)
-        control = 0
-        my_each { |i| control += 1 if !(i.kind_of? (arg))}
-        control.zero?
+      if arg.instance_of?(Regexp)
+        my_each { |i| control += 1 if i.to_s.match(arg).nil? }
+      elsif arg.is_a?(Class)
+        my_each { |i| control += 1 unless i.is_a?(arg) }
       else
-        all = true
         my_each { |i| break all = false if i != arg }
-        all 
+        all
       end
     else
-      control = 0
-      self.my_each{ |i| control += 1 if i == false || i == nil}
-      control.zero?
+      my_each { |i| control += 1 if [false, nil].include?(i) }
     end
+    control.zero?
   end
 
-  def my_any?(arg=nil)
-    if block_given? 
+  def my_any?(arg = nil)
+    control = 0
+    if block_given?
       all = true
       my_each { |i| break all = false unless yield(i) }
-      all 
+      all
     elsif !arg.nil?
-      if arg.class == Regexp 
-        control = 0
-        my_each { |i| control += 1 if !!(i.to_s.match(arg))}
-        control.positive?
-      elsif arg.is_a? (Class)
-        control = 0
-        my_each { |i| break control += 1 if (i.kind_of? (arg))}
-        control.positive?
+      if arg.instance_of?(Regexp)
+        my_each { |i| control += 1 unless i.to_s.match(arg).nil? }
+      elsif arg.is_a?(Class)
+        my_each { |i| break control += 1 if i.is_a?(arg) }
       else
-        control = 0
         my_each { |i| control += 1 if i == arg }
-        control.positive?
       end
     else
       control = 0
-      self.my_each{ |i| control += 1 if i == false || i == nil}
+      my_each { |i| control += 1 if [false, nil].include?(i) }
       control.zero?
     end
+    control.positive?
   end
 
   def my_none?(arg = nil)
-    if block_given? 
-      control = 0
+    control = 0
+    if block_given?
       my_each { |i| control += 1 unless yield(i) }
-      control.zero? 
     elsif !arg.nil?
-      if arg.class == Regexp 
-        control = 0
-        my_each { |i| control += 1 if !!(i.to_s.match(arg))}
-        control.zero?
-      elsif arg.is_a? (Class)
-        control = 0
-        my_each { |i| control += 1 if (i.kind_of? (arg))}
-        control.zero?
+      if arg.instance_of?(Regexp)
+        my_each { |i| control += 1 unless i.to_s.match(arg).nil? }
+      elsif arg.is_a?(Class)
+        my_each { |i| control += 1 if i.is_a?(arg) }
       else
         all = true
         my_each { |i| break all = false if i != arg }
-        all 
+        all
       end
     else
-      control = 0
-      self.my_each{ |i| control += 1 if i != false || i != nil}
-      control.zero?
+      my_each { |i| control += 1 if i != false || !i.nil? }
     end
+    control.zero?
   end
 
   def my_count(arg = nil)
@@ -122,39 +108,27 @@ module Enumerable
 
   def my_map(proc = nil)
     arr_new = []
-    if proc != nil 
+    if !proc.nil?
       my_each { |i| arr_new << proc.call(i) }
     elsif block_given?
       my_each { |i| arr_new << yield(i) }
     else
-      return to_enum(:my_map)
+      to_enum(:my_map, proc)
     end
     arr_new
   end
 
-  def my_inject(initial_value = nil, sym = nil)
-    if (!initial_value.nil? && sym.nil?) && (initial_value.is_a?(Symbol) || initial_value.is_a?(String))
-      sym = initial_value
-      initial_value = nil
+  def my_inject(initial = nil, sym = nil)
+    if (!initial.nil? && sym.nil?) && (initial.is_a?(Symbol) || initial.is_a?(String))
+      sym = initial
+      initial = nil
     end
-    if block_given?
-      my_each {|item| initial_value = initial_value.nil? ? item : yield(initial_value, item)}
+    if !block_given? && !sym.nil?
+      my_each { |item| initial = initial.nil? ? item : initial.send(sym, item) }
     else
-      if (sym == nil || sym == :+ || sym == "+")
-        my_each{|item| initial_value = initial_value.nil? ? item : (initial_value.to_i + item.to_i)}
-      elsif (sym == :- || sym == "-")
-        my_each{|item| initial_value = initial_value.nil? ? item : (initial_value.to_i - item)}
-      elsif (sym == :* || sym == "*")
-        my_each{|item| initial_value = initial_value.nil? ? item : (initial_value * item)}
-      elsif (sym == :/ || sym == "/")
-        my_each{|item| initial_value = initial_value.nil? ? item : (initial_value / item)}
-      elsif (sym == :% || sym == "%")
-        my_each{|item| initial_value = initial_value.nil? ? item : (initial_value % item)}
-      elsif (sym == :** || sym == "**")
-        my_each{|item| initial_value = initial_value.nil? ? item : (initial_value ** item)}
-      end
+      my_each { |item| initial = initial.nil? ? item : yield(initial, item) }
     end
-    initial_value
+    initial
   end
 end
 
@@ -163,42 +137,37 @@ def multiply_els(arr)
 end
 
 # Testing
-control = [10, 1, 2, 5, 7, 8, 9, 12, 13, 14, 15, 16, 17, 18, 19, 20, 1 ]
-control2 = [10, 1, 2, 5, 7, 8, 9, 12, 13, 14, 15, 16, 17, 18, 19, 20, 1 ]
-control3 = [1, "_"]
-control4 = ["a", "b"]
-control5 = [2,3,4]
-test = ["a", "ba"]
-puts "my_each:"
-p control.my_each { |value| value < 3 }
-p control.each { |value| value < 3}
-puts "my_each with index:"
-hash = {a: 1, b: 2, c: 3, d:4, e:5 }
-p hash.my_each_with_index { |k, v| print k.to_s + ":" + v.to_s + " " }
-p hash.each_with_index { |k, v| print k.to_s + ":" + v.to_s + " " }
-puts "my_select:"
-p control.my_select
-puts "my_all?:"
-p control2.my_all?(Numeric)
-p test.my_all?(String)
-p test.my_all?(/a/)
-puts "my_any?:"
-p control3.my_any?(/a/)
-puts "my_none?:"
-p control4.my_none?(Numeric)
-puts "my_count:"
-p control.my_count
-p control.my_count
- my_proc = Proc.new { |i| i + 1 }
- puts "my_map:"
- p control.my_map(my_proc){ |i| i * 2 }
- p (1..6).my_map { |i| i * 2 }
- p control.my_map { |i| i * 2 }.my_map(my_proc)
- p control.my_map 
-puts "my_inject:"
-
-
-p (2..5).my_inject("**")
-p %w[cat sheep bear adadasdsdadas].my_inject {|memo, word| memo.length > word.length ? memo : word}
-# puts "multiply_els:"
-# p multiply_els(control)
+# control = [10, 1, 2, 5, 7, 8, 9, 12, 13, 14, 15, 16, 17, 18, 19, 20, 1 ]
+# control2 = [10, 1, 2, 5, 7, 8, 9, 12, 13, 14, 15, 16, 17, 18, 19, 20, 1 ]
+# control3 = [nil, nil]
+# control4 = [1, 2]
+# control5 = [2,3,4]
+# test = ["a", "ba"]
+# puts "my_each:"
+# p control.my_each { |value| value < 3 }
+# p control.each { |value| value < 3}
+# puts "my_each with index:"
+# hash = {a: 1, b: 2, c: 3, d:4, e:5 }
+# p hash.my_each_with_index { |k, v| print k.to_s + ":" + v.to_s + " " }
+# p hash.each_with_index { |k, v| print k.to_s + ":" + v.to_s + " " }
+# puts "my_select:"
+# p control.my_select
+# puts "my_all?:"
+# p control2.my_all?(Numeric)
+# p test.my_all?(String)
+# p test.my_all?(/a/)
+# puts "my_any?:"
+# p control3.my_any?(/a/)
+# puts "my_none?:"
+# p control4.my_none?(String)
+# puts "my_count:"
+# p control.my_count
+# p control.my_count
+#  my_proc = Proc.new { |i| i + 1 }
+#  puts "my_map:"
+#  p control.my_map(my_proc){ |i| i * 2 }
+#  p (1..6).my_map { |i| i * 2 }
+#  p control.my_map { |i| i * 2 }.my_map(my_proc)
+#  p control.my_map
+# puts "my_inject:"
+# p (2..5).my_inject("+")
