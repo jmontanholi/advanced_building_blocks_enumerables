@@ -32,14 +32,14 @@ module Enumerable
       my_each { |i| break all = false unless yield(i) }
       all 
     elsif !arg.nil?
-      if arg.is_a? (Class)
-        something = 0
-        my_each { |i| something += 1 if !(i.class === arg.class)}
-        if something == 0
-          true
-        else
-          false
-        end
+      if arg.class == Regexp 
+        control = 0
+        my_each { |i| control += 1 unless !!(i.match(arg) )}
+        control.zero?
+      elsif arg.is_a? (Class)
+        control = 0
+        my_each { |i| control += 1 if !(i.kind_of? (arg))}
+        control.zero?
       else
         all = true
         my_each { |i| break all = false if i != arg }
@@ -48,11 +48,7 @@ module Enumerable
     else
       control = 0
       self.my_each{ |i| control += 1 if i == false || i == nil}
-      if control == 0
-        true
-      else
-        false
-      end
+      control.zero?
     end
   end
 
@@ -103,8 +99,9 @@ def multiply_els(arr)
 end
 
 # Testing
-control = [10, 1, 2, 5, 7, 8, 9, 12, 13, 14, 15, 16, 17, 18, 19, 20, 1]
-test = [3]
+control = [10, 1, 2, 5, 7, 8, 9, 12, 13, 14, 15, 16, 17, 18, 19, 20, 1 ]
+control2 = [10, 1, 2, 5, 7, 8, 9, 12, 13, 14, 15, 16, 17, 18, 19, 20, 1 ]
+test = ["a", "ba"]
 puts "my_each:"
 p control.my_each { |value| value < 3 }
 p control.each { |value| value < 3}
@@ -115,8 +112,9 @@ p hash.each_with_index { |k, v| print k.to_s + ":" + v.to_s + " " }
 puts "my_select:"
 p control.my_select
 puts "my_all?:"
-p test.my_all?(Numeric)
-p test.all?(Numeric)
+p control2.my_all?(Numeric)
+p test.my_all?(String)
+p test.my_all?(/a/)
 # puts "my_any?:"
 # p control.my_any? { |i| i < 15 }
 # puts "my_none?:"
