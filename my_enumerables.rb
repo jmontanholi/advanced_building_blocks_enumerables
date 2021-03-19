@@ -1,24 +1,59 @@
 module Enumerable
   def my_each
-    length.times { |i| yield(self[i]) }
+    return to_enum(:my_each) unless block_given?
+    for i in self do
+      yield(i)
+    end
     self
   end
 
   def my_each_with_index
-    length.times { |i| yield(self[i], i) }
+    return to_enum(:my_each_with_index) unless block_given?
+    count = 0
+    for i in self do
+      yield(i, count)
+      count += 1
+    end
     self
   end
 
   def my_select
+    return to_enum(:my_select) unless block_given?
+
     arr_new = []
     my_each { |i| arr_new << i if yield(i) }
     arr_new
   end
 
-  def my_all?
-    all = true
-    my_each { |i| break all = false unless yield(i) }
-    all
+  def my_all?(arg = nil)
+    return false if self.empty?
+    if block_given? 
+      all = true
+      my_each { |i| break all = false unless yield(i) }
+      all 
+    elsif !arg.nil?
+      if arg.is_a? (Class)
+        something = 0
+        my_each { |i| something += 1 if !(i.class === arg.class)}
+        if something == 0
+          true
+        else
+          false
+        end
+      else
+        all = true
+        my_each { |i| break all = false if i != arg }
+        all 
+      end
+    else
+      control = 0
+      self.my_each{ |i| control += 1 if i == false || i == nil}
+      if control == 0
+        true
+      else
+        false
+      end
+    end
   end
 
   def my_any?
@@ -68,18 +103,20 @@ def multiply_els(arr)
 end
 
 # Testing
-# control = [10, 1, 2, 5, 7, 8, 9, 12, 13, 14, 15, 16, 17, 18, 19, 20, 1]
-
-# puts "my_each:"
-# control.my_each { |value| p value }
-# puts
-# puts "my_each with index:"
-# control.my_each_with_index { |i, ind| print ind.to_s + ":" + i.to_s + " " }
-# puts
-# puts "my_select:"
-# p control.my_select { |i| i < 11 }
-# puts "my_all?:"
-# p control.my_all? { |i| i < 15 }
+control = [10, 1, 2, 5, 7, 8, 9, 12, 13, 14, 15, 16, 17, 18, 19, 20, 1]
+test = [3]
+puts "my_each:"
+p control.my_each { |value| value < 3 }
+p control.each { |value| value < 3}
+puts "my_each with index:"
+hash = {a: 1, b: 2, c: 3, d:4, e:5 }
+p hash.my_each_with_index { |k, v| print k.to_s + ":" + v.to_s + " " }
+p hash.each_with_index { |k, v| print k.to_s + ":" + v.to_s + " " }
+puts "my_select:"
+p control.my_select
+puts "my_all?:"
+p test.my_all?(Numeric)
+p test.all?(Numeric)
 # puts "my_any?:"
 # p control.my_any? { |i| i < 15 }
 # puts "my_none?:"
