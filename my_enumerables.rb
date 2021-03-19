@@ -32,14 +32,14 @@ module Enumerable
     if block_given?
       my_each { |i| break all = false unless yield(i) }
     elsif !arg.nil?
-      all = self.getIntance(arg)
+      all = get_instance(arg)
     else
       my_each { |i| break all = false if [false, nil].include?(i) }
     end
     all
   end
 
-  private def getIntance(arg)
+  def get_instance(arg)
     all = true
     if arg.instance_of?(Regexp)
       my_each { |i| break all = false if i.to_s.match(arg).nil? }
@@ -141,7 +141,7 @@ end
 
 # # Testing
 # control = [10, 1, 2, 5, 7, 8, 9, 12, 13, 14, 15, 16, 17, 18, 19, 20, 1 ]
-#  control2 = [10, 1, 2, 5, 7, 8, 9, 12, 13, 14, 15, 16, 17, 18, 19, 20, 1 ]
+# control2 = [10, 1, 2, 5, 7, 8, 9, 12, 13, 14, 15, 16, 17, 18, 19, 20, 1 ]
 #  control3 = [nil, nil]
 #  control4 = [1, 2]
 #  control5 = [2,3,4]
