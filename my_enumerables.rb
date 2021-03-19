@@ -1,16 +1,16 @@
 module Enumerable
-  def my_each(&block)
+  def my_each
     return to_enum(:my_each) unless block_given?
-
-    each(&block)
+    for i in self do
+      yield(i)
+    end
     self
   end
 
   def my_each_with_index
     return to_enum(:my_each_with_index) unless block_given?
-
     count = 0
-    each do |i|
+    for i in self do
       yield(i, count)
       count += 1
     end
@@ -26,26 +26,22 @@ module Enumerable
   end
 
   def my_all?(arg = nil)
-    return false if empty?
-
     control = 0
     all = true
     if block_given?
       my_each { |i| break all = false unless yield(i) }
-      all
     elsif !arg.nil?
       if arg.instance_of?(Regexp)
-        my_each { |i| control += 1 if i.to_s.match(arg).nil? }
+        my_each { |i| break all = false if i.to_s.match(arg).nil? }
       elsif arg.is_a?(Class)
-        my_each { |i| control += 1 unless i.is_a?(arg) }
+        my_each { |i| break all = false unless i.is_a?(arg) }
       else
         my_each { |i| break all = false if i != arg }
-        all
       end
     else
-      my_each { |i| control += 1 if [false, nil].include?(i) }
+      my_each { |i| break all = false if [false, nil].include?(i) }
     end
-    control.zero?
+    all
   end
 
   def my_any?(arg = nil)
@@ -137,37 +133,37 @@ def multiply_els(arr)
 end
 
 # Testing
-# control = [10, 1, 2, 5, 7, 8, 9, 12, 13, 14, 15, 16, 17, 18, 19, 20, 1 ]
-# control2 = [10, 1, 2, 5, 7, 8, 9, 12, 13, 14, 15, 16, 17, 18, 19, 20, 1 ]
-# control3 = [nil, nil]
-# control4 = [1, 2]
-# control5 = [2,3,4]
-# test = ["a", "ba"]
-# puts "my_each:"
-# p control.my_each { |value| value < 3 }
-# p control.each { |value| value < 3}
-# puts "my_each with index:"
-# hash = {a: 1, b: 2, c: 3, d:4, e:5 }
-# p hash.my_each_with_index { |k, v| print k.to_s + ":" + v.to_s + " " }
-# p hash.each_with_index { |k, v| print k.to_s + ":" + v.to_s + " " }
-# puts "my_select:"
-# p control.my_select
-# puts "my_all?:"
-# p control2.my_all?(Numeric)
-# p test.my_all?(String)
-# p test.my_all?(/a/)
-# puts "my_any?:"
-# p control3.my_any?(/a/)
-# puts "my_none?:"
-# p control4.my_none?(String)
-# puts "my_count:"
-# p control.my_count
-# p control.my_count
-#  my_proc = Proc.new { |i| i + 1 }
-#  puts "my_map:"
-#  p control.my_map(my_proc){ |i| i * 2 }
-#  p (1..6).my_map { |i| i * 2 }
-#  p control.my_map { |i| i * 2 }.my_map(my_proc)
-#  p control.my_map
-# puts "my_inject:"
-# p (2..5).my_inject("+")
+control = [10, 1, 2, 5, 7, 8, 9, 12, 13, 14, 15, 16, 17, 18, 19, 20, 1 ]
+ control2 = [10, 1, 2, 5, 7, 8, 9, 12, 13, 14, 15, 16, 17, 18, 19, 20, 1 ]
+ control3 = [nil, nil]
+ control4 = [1, 2]
+ control5 = [2,3,4]
+ test = ["a", "ba"]
+ puts "my_each:"
+ p control.my_each { |value| value < 3 }
+ p control.each { |value| value < 3}
+ puts "my_each with index:"
+ hash = {a: 1, b: 2, c: 3, d:4, e:5 }
+ p hash.my_each_with_index { |k, v| print k.to_s + ":" + v.to_s + " " }
+ p hash.each_with_index { |k, v| print k.to_s + ":" + v.to_s + " " }
+ puts "my_select:"
+ p control.my_select
+ puts "my_all?:"
+ p control2.my_all?(Numeric)
+ p test.my_all?(String)
+ p test.my_all?(/a/)
+ puts "my_any?:"
+ p control3.my_any?(/a/)
+ puts "my_none?:"
+ p control4.my_none?(String)
+ puts "my_count:"
+ p control.my_count
+ p control.my_count
+  my_proc = Proc.new { |i| i + 1 }
+  puts "my_map:"
+  p control.my_map(my_proc){ |i| i * 2 }
+  p (1..6).my_map { |i| i * 2 }
+  p control.my_map { |i| i * 2 }.my_map(my_proc)
+  p control.my_map
+ puts "my_inject:"
+ p (2..5).my_inject("+")
