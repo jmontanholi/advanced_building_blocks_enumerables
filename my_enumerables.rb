@@ -132,8 +132,28 @@ module Enumerable
     arr_new
   end
 
-  def my_inject(initial_value = nil)
-    my_each { |i| initial_value = yield(i, i) }
+  def my_inject(initial_value = nil, sym = nil)
+    if (!initial_value.nil? && sym.nil?) && (initial_value.is_a?(Symbol) || initial_value.is_a?(String))
+      sym = initial_value
+      initial_value = nil
+    end
+    if block_given?
+      my_each {|item| initial_value = initial_value.nil? ? item : yield(initial_value, item)}
+    else
+      if (sym == nil || sym == :+ || sym == "+")
+        my_each{|item| initial_value = initial_value.nil? ? item : (initial_value.to_i + item.to_i)}
+      elsif (sym == :- || sym == "-")
+        my_each{|item| initial_value = initial_value.nil? ? item : (initial_value.to_i - item)}
+      elsif (sym == :* || sym == "*")
+        my_each{|item| initial_value = initial_value.nil? ? item : (initial_value * item)}
+      elsif (sym == :/ || sym == "/")
+        my_each{|item| initial_value = initial_value.nil? ? item : (initial_value / item)}
+      elsif (sym == :% || sym == "%")
+        my_each{|item| initial_value = initial_value.nil? ? item : (initial_value % item)}
+      elsif (sym == :** || sym == "**")
+        my_each{|item| initial_value = initial_value.nil? ? item : (initial_value ** item)}
+      end
+    end
     initial_value
   end
 end
@@ -147,6 +167,7 @@ control = [10, 1, 2, 5, 7, 8, 9, 12, 13, 14, 15, 16, 17, 18, 19, 20, 1 ]
 control2 = [10, 1, 2, 5, 7, 8, 9, 12, 13, 14, 15, 16, 17, 18, 19, 20, 1 ]
 control3 = [1, "_"]
 control4 = ["a", "b"]
+control5 = [2,3,4]
 test = ["a", "ba"]
 puts "my_each:"
 p control.my_each { |value| value < 3 }
@@ -177,7 +198,7 @@ p control.my_count
 puts "my_inject:"
 
 
-
-p %w[cat sheep bear].my_inject {|memo, word| memo.length > word.length ? memo : word}
+p (2..5).my_inject("**")
+p %w[cat sheep bear adadasdsdadas].my_inject {|memo, word| memo.length > word.length ? memo : word}
 # puts "multiply_els:"
 # p multiply_els(control)
