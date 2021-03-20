@@ -49,26 +49,25 @@ module Enumerable
   end
 
   def get_instance_any(arg)
-    all = true
+    control = 0
     if arg.instance_of?(Regexp)
-      my_each { |i| break all = false unless i.to_s.match(arg).nil? }
+      my_each { |i|  control += 1 unless i.to_s.match(arg).nil? }
     elsif arg.is_a?(Class)
-      my_each { |i| break all = false if i.is_a?(arg) }
+      my_each { |i| control += 1 if i.is_a?(arg) }
     else
-      my_each { |i| break all = false if i == arg }
+      my_each { |i| control += 1 if  i == arg }
     end
-    all
+    control.positive?
   end
 
   def my_any?(arg = nil)
     control = 0
     if block_given?
       my_each { |i| control += 1 if yield(i) }
-    elsif arg.nil?
-      get_instance_any(arg)
+    elsif !arg.nil?
+      return get_instance_any(arg)
     else
-      my_each { |i| control += 1 if [false, nil].include?(i) }
-      control.zero?
+      my_each { |i| control += 1 unless (i == false || i.nil? )}
     end
     control.positive?
   end
@@ -78,9 +77,9 @@ module Enumerable
     if block_given?
       my_each { |i| control += 1 unless yield(i) }
     elsif !arg.nil?
-      return get_instance_any(arg)
+      return !get_instance(arg)
     else
-      my_each { |i| control += 1 if i != false || !i.nil? }
+      my_each { |i| control += 1 unless (i == false || i.nil? )}
     end
     control.zero?
   end
@@ -96,12 +95,10 @@ module Enumerable
   end
 
   def my_map(proc = nil)
+    return to_enum(:my_map, proc) unless block_given?
+
     arr_new = []
-    if proc.nil?
-      block_given? ? my_each { |i| arr_new << yield(i) } : to_enum(:my_map, proc)
-    else
-      my_each { |i| arr_new << proc.call(i) }
-    end
+    proc.nil? ? my_each { |i| arr_new << proc.call(i) } : my_each { |i| arr_new << yield(i) } 
     arr_new
   end
 
@@ -126,7 +123,7 @@ end
 # # Testing
 #  control = [10, 1, 2, 5, 7, 8, 9, 12, 13, 14, 15, 16, 17, 18, 19, 20, 1 ]
 #  control2 = [10, 1, 2, 5, 7, 8, 9, 12, 13, 14, 15, 16, 17, 18, 19, 20, 1 ]
-#   control3 = [nil, nil]
+#  control3 = [false, 2]
 #   control4 = [1, 2]
 #   control5 = [2,3,4]
 # test = ["1", 3]
@@ -144,9 +141,9 @@ end
 # p test.my_all?(String)
 # p test.my_all?(/a/)
 # puts "my_any?:"
-# p test.my_any?{|i| i < 3}
+# p control3.my_any?(/ue/)
 # puts "my_none?:"
-# p test.my_none?(String)
+# p control3.my_none?
 #  puts "my_count:"
 #  p control.my_count{|i| i < 17}
 #  p control.count{|i| i < 17}
@@ -155,6 +152,6 @@ end
 # p control.my_map(my_proc){ |i| i * 2 }
 # p (1..6).my_map { |i| i * 2 }
 # p control.my_map { |i| i * 2 }.my_map(my_proc)
-# p control.my_map
+# p control3.my_map
 #  puts "my_inject:"
 #  p (2..5).my_inject{|sum, i| i + 2}
