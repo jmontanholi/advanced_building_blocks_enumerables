@@ -51,11 +51,11 @@ module Enumerable
   def get_instance_any(arg)
     control = 0
     if arg.instance_of?(Regexp)
-      my_each { |i|  control += 1 unless i.to_s.match(arg).nil? }
+      my_each { |i| control += 1 unless i.to_s.match(arg).nil? }
     elsif arg.is_a?(Class)
       my_each { |i| control += 1 if i.is_a?(arg) }
     else
-      my_each { |i| control += 1 if  i == arg }
+      my_each { |i| control += 1 if i == arg }
     end
     control.positive?
   end
@@ -67,7 +67,7 @@ module Enumerable
     elsif !arg.nil?
       return get_instance_any(arg)
     else
-      my_each { |i| control += 1 unless (i == false || i.nil? )}
+      my_each { |i| control += 1 unless i == false || i.nil? }
     end
     control.positive?
   end
@@ -79,7 +79,7 @@ module Enumerable
     elsif !arg.nil?
       return !get_instance(arg)
     else
-      my_each { |i| control += 1 unless (i == false || i.nil? )}
+      my_each { |i| control += 1 unless i == false || i.nil? }
     end
     control.zero?
   end
@@ -98,7 +98,7 @@ module Enumerable
     return to_enum(:my_map, proc) unless block_given?
 
     arr_new = []
-    proc.nil? ? my_each { |i| arr_new << proc.call(i) } : my_each { |i| arr_new << yield(i) } 
+    proc.nil? ? my_each { |i| arr_new << proc.call(i) } : my_each { |i| arr_new << yield(i) }
     arr_new
   end
 
