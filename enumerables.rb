@@ -103,7 +103,7 @@ module Enumerable
   end
 
   def my_inject(initial = nil, sym = nil)
-    if  sym.nil? && (initial.is_a?(Symbol) || initial.is_a?(String))
+    if sym.nil? && (initial.is_a?(Symbol) || initial.is_a?(String))
       sym = initial
       initial = nil
     end
