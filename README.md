@@ -2,7 +2,7 @@
 
 # Ruby Module - Microverse - Enumerables
 
-> description of project
+> In this project we re-created the Ruby enumerables from scratch.
 
 ## Built With
 
@@ -19,8 +19,8 @@
   * How to set locally
     * Clone the repository into your local machine
     * Open the project with your code editor
+    * remove comment code, and use `ruby my_enumerables.rb`
     * Try it out!
-
 ## Authors
 
 👤 **João Vítor Montanholi Nunes**
