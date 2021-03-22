@@ -75,9 +75,9 @@ module Enumerable
   def my_none?(arg = nil)
     control = 0
     if block_given?
-      my_each { |i| control += 1 unless yield(i) }
+      my_each { |i| control += 1 if yield(i) }
     elsif !arg.nil?
-      return !get_instance(arg)
+      return !get_instance_any(arg)
     else
       my_each { |i| control += 1 unless i == false || i.nil? }
     end
@@ -98,19 +98,19 @@ module Enumerable
     return to_enum(:my_map, proc) unless block_given?
 
     arr_new = []
-    proc.nil? ? my_each { |i| arr_new << proc.call(i) } : my_each { |i| arr_new << yield(i) }
+    proc.nil? ? my_each { |i| arr_new << yield(i) } : my_each { |i| arr_new << proc.call(i) }
     arr_new
   end
 
   def my_inject(initial = nil, sym = nil)
-    if sym.nil? && (initial.is_a?(Symbol) || initial.is_a?(String))
+    if  sym.nil? && (initial.is_a?(Symbol) || initial.is_a?(String))
       sym = initial
       initial = nil
     end
-    if block_given?
-      my_each { |item| initial = initial.nil? ? item : yield(initial, item) }
-    else
+    if !block_given? && !sym.nil?
       my_each { |item| initial = initial.nil? ? item : initial.send(sym, item) }
+    else
+      my_each { |item| initial = initial.nil? ? item : yield(initial, item) }
     end
     initial
   end
@@ -121,37 +121,47 @@ def multiply_els(arr)
 end
 
 # # Testing
-#  control = [10, 1, 2, 5, 7, 8, 9, 12, 13, 14, 15, 16, 17, 18, 19, 20, 1 ]
-#  control2 = [10, 1, 2, 5, 7, 8, 9, 12, 13, 14, 15, 16, 17, 18, 19, 20, 1 ]
-#  control3 = [false, 2]
-#   control4 = [1, 2]
-#   control5 = [2,3,4]
+# control = [10, 1, 2, 5, 7, 8, 9, 12, 13, 14, 15, 16, 17, 18, 19, 20, 1 ]
+# control2 = [10, 1, 2, 5, 7, 8, 9, 12, 13, 14, 15, 16, 17, 18, 19, 20, 1 ]
+# control3 = [false, 2]
+# control4 = [1, 2]
+# control5 = [2,3,4]
 # test = ["1", 3]
-#   puts "my_each:"
-#   p control.my_each { |value| value < 3 }
-#   p control.each { |value| value < 3}
-#   puts "my_each with index:"
-#   hash = {a: 1, b: 2, c: 3, d:4, e:5 }
-#   p hash.my_each_with_index { |k, v| print k.to_s + ":" + v.to_s + " " }
-#   p hash.each_with_index { |k, v| print k.to_s + ":" + v.to_s + " " }
-#   puts "my_select:"
-#   p control.my_select
+# puts "my_each:"
+# p control.my_each { |value| value < 3 }
+# p control.each { |value| value < 3}
+# puts "my_each with index:"
+# hash = {a: 1, b: 2, c: 3, d:4, e:5 }
+# p hash.my_each_with_index { |k, v| print k.to_s + ":" + v.to_s + " " }
+# p hash.each_with_index { |k, v| print k.to_s + ":" + v.to_s + " " }
+# puts "my_select:"
+# p control.my_select
 # puts "my_all?:"
-# p control2.my_all?(Numeric)
-# p test.my_all?(String)
-# p test.my_all?(/a/)
+# p %w[ant bear cat].my_all? { |word| word.length >= 3 } #=> true
+# p %w[ant bear cat].my_all? { |word| word.length >= 4 } #=> false
+# p %w[ant bear cat].my_all?(/t/)                        #=> false
+# p [1, 2i, 3.14].my_all?(Numeric)                       #=> true
+# p [nil, true, 99].my_all?                              #=> false
+# p [].my_all?                                           #=> true
 # puts "my_any?:"
 # p control3.my_any?(/ue/)
 # puts "my_none?:"
-# p control3.my_none?
-#  puts "my_count:"
-#  p control.my_count{|i| i < 17}
-#  p control.count{|i| i < 17}
+# p %w{ant bear cat}.my_none? { |word| word.length == 5 } #=> true
+# p %w{ant bear cat}.my_none? { |word| word.length >= 4 } #=> false
+# p %w{ant bear cat}.my_none?(/d/)                        #=> true
+# p [1, 3.14, 42].my_none?(Float)                         #=> false
+# p [].my_none?                                          #=> true
+# p [nil].my_none?                                      #=> true
+# p [nil, false].my_none?                                #=> true
+# p [nil, false, true].my_none?                          #=> false
+# puts "my_count:"
+# p control.my_count{|i| i < 17}
+# p control.count{|i| i < 17}
 # my_proc = Proc.new { |i| i + 1 }
 # puts "my_map:"
-# p control.my_map(my_proc){ |i| i * 2 }
-# p (1..6).my_map { |i| i * 2 }
-# p control.my_map { |i| i * 2 }.my_map(my_proc)
-# p control3.my_map
-#  puts "my_inject:"
-#  p (2..5).my_inject{|sum, i| i + 2}
+# p control.map { |i| i*i }      #=> [1, 4, 9, 16]
+# p control.my_map { |num| num < 10 }
+# p control.map { |num| num < 10 }
+# puts "my_inject:"
+# p (2..5).my_inject
+# p (2..5).inject(:+)
