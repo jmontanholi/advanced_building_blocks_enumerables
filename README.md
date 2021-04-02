@@ -2,7 +2,7 @@
 
 # Ruby Module - Microverse - Enumerables
 
-> In this project we re-created the Ruby enumerables from scratch.
+> In this project we re-created the Ruby enumerables from scratch and used Rspec to test it.
 
 ## Built With
 
@@ -21,6 +21,10 @@
     * Open the project with your code editor
     * remove comment code, and use `ruby my_enumerables.rb`
     * Try it out!
+
+### To run the TDD in your machine:
+  * You must install RSpec locally and run it in your terminal.
+
 ## Authors
 
 👤 **João Vítor Montanholi Nunes**
