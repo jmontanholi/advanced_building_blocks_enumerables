@@ -139,3 +139,24 @@ describe '#my_map' do
     expect((1..4).my_map).to be_an Enumerator
   end
 end
+
+describe '#my_inject' do 
+  it 'Combines all elements of enum by applying a binary operation specified by a block that names a method or operator.' do
+    expect((5..10).my_inject { |sum, n| sum + n }).to eql(45)
+  end
+
+  it 'Combines all elements of enum by applying a binary operation specified by a symbol' do 
+    expect((2..5).my_inject(:+)).to eql(14)
+  end
+
+  it 'If no initial value for sum or a symbol is passed nor a block is given it returns an error' do
+    expect{(2..5).my_inject}.to raise_error(LocalJumpError)
+  end
+
+  it 'Find the longest word in an array with the right block' do 
+    longest = %w{ cat sheep bear }.my_inject do |memo, word|
+      memo.length > word.length ? memo : word
+   end
+   expect(longest).to eql('sheep')
+  end
+end

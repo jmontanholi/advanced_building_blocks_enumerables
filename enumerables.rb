@@ -163,4 +163,4 @@ end
 # p control.map { |num| num < 10 }
 # puts "my_inject:"
 # p (2..5).my_inject
-# p (2..5).inject(:+)
+# p (2..5).inject
