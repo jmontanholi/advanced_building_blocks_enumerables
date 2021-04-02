@@ -39,6 +39,12 @@
 - Twitter: [FayeRolando](https://twitter.com/FayeRolando)
 - LinkedIn: [Rolando Diego](https://www.linkedin.com/in/rolando-diego-alvarez-faye-b2b34a1a9/)
 
+👤**Maha Magdy**
+
+- GitHub: [Maha-Magdy](https://github.com/Maha-Magdy)
+- Twitter: [@Maha_M_Abdelaal](https://twitter.com/Maha_M_Abdelaal)
+- LinkedIn: [Maha Magdy](https://www.linkedin.com/in/maha-magdy-18a8a7116/)
+
 ## 🤝 Contributing
 
 Contributions, issues, and feature requests are welcome!
