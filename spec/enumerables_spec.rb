@@ -1,4 +1,4 @@
-require './enumerables.rb'
+require './enumerables'
 
 describe '#my_each' do
   it 'goes through every item in an array' do
