@@ -46,7 +46,7 @@ describe '#my_select' do
   end
 end
 
-describe '#my_all' do
+describe '#my_all?' do
   it 'my_all will return true if all elements pass tha condition in the block-given' do
     expect(%w[ant bear cat].my_all? { |word| word.length >= 3 }).to be true
   end
@@ -65,5 +65,53 @@ describe '#my_all' do
 
   it 'my_all will return false if any element in the given array is falsy value' do
     expect([nil, true, 99].my_all? ).to be false
+  end
+
+  it 'will return true if the array passed is empty and there is no block or argument' do 
+    expect([].my_all?).to be true
+  end
+end
+
+describe '#my_any?' do
+  it 'will return true if any element pass the condition in the given block' do
+    expect(%w[ant bear cat].my_any? { |word| word.length >= 3 }).to be true
+  end
+
+  it 'will return false if no element pass the condition in the given block' do
+    expect(%w[ant bear cat].my_any?{ |word| word.length >= 5}).to be false
+  end
+
+  it 'will return true if any element match the given argument' do
+    expect([nil, true, 99].my_any?(Integer)).to be true
+  end
+
+  it 'will return true if no block is given and any element is a truthy value' do 
+    expect([nil, true, 99].my_any?).to be true
+  end
+
+  it 'will return false if the array passed is empty and there is no block or argument' do 
+    expect([].my_any?).to be false
+  end
+end
+
+describe '#my_none?' do
+  it 'will return true if no element pass the condition in the given block' do 
+    expect(%w{ant bear cat}.my_none? { |word| word.length == 5 }).to be true
+  end
+
+  it 'will return false if any element pass the condition in the given block' do 
+    expect(%w{ant bear cat}.my_none? { |word| word.length >= 4 }).to be false
+  end
+
+  it 'will return false if any element match the given argument' do
+    expect([1, 3.14, 42].my_none?(Float)).to be false
+  end
+
+  it 'will return true if the given array is empty and no block or argument is given' do 
+    expect([].my_none?).to be true
+  end
+
+  it 'will return true if all elements in the array are false values' do 
+    expect([nil, false].my_none?).to be true
   end
 end
