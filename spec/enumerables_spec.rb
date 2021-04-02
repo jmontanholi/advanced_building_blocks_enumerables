@@ -115,3 +115,27 @@ describe '#my_none?' do
     expect([nil, false].my_none?).to be true
   end
 end
+
+describe '#my_count' do
+  it 'my_count will return the number of elements in the array if no block-given or given argument passed' do
+    expect([1, 2, 4, 2].my_count).to eql(4) 
+  end
+
+  it 'my_count will return the number of elements in the array that match the value of given argument' do
+    expect([1, 2, 4, 2].my_count(2)).to eql(2) 
+  end
+
+  it 'my_count will return the number of elements in the array that pass the conition in block given' do
+    expect([1, 2, 4, 2].my_count{ |x| x%2==0 }).to eql(3) 
+  end
+end
+
+describe '#my_map' do
+  it 'my_map Returns a new array with the results of running block once for every element in enum' do
+    expect((1..4).my_map { |i| i*i }).to eql([1, 4, 9, 16])
+  end
+
+  it 'my_map will return an enumerator If no block is given' do
+    expect((1..4).my_map).to be_an Enumerator
+  end
+end
