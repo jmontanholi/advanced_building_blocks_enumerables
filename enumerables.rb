@@ -128,12 +128,11 @@ end
 # control5 = [2,3,4]
 # test = ["1", 3]
 # puts "my_each:"
-# p control.my_each { |value| value < 3 }
-# p control.each { |value| value < 3}
+# p control.my_each { |value| value}
+# p control.each { |value| value}
 # puts "my_each with index:"
-# hash = {a: 1, b: 2, c: 3, d:4, e:5 }
-# p hash.my_each_with_index { |k, v| print k.to_s + ":" + v.to_s + " " }
-# p hash.each_with_index { |k, v| print k.to_s + ":" + v.to_s + " " }
+hash = {a: 1, b: 2, c: 3, d:4, e:5 }
+p [1, 2, 3, 4 ,5].my_each_with_index { |k, v|"#{k} and #{v}"}
 # puts "my_select:"
 # p control.my_select
 # puts "my_all?:"
